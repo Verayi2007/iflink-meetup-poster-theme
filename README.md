@@ -243,6 +243,25 @@ $ python scripts/check-palette.py poster.png
 
 ---
 
+## ✦ 贡献者
+
+<table>
+<tr>
+<td width="72" valign="top"><a href="https://github.com/EeeEricxiao"><img src="https://github.com/EeeEricxiao.png" width="56" style="border-radius:50%" alt="EeeEricxiao" /></a></td>
+<td valign="top">
+
+**[@EeeEricxiao](https://github.com/EeeEricxiao)** — 主色可选能力
+
+提出并实现了「先选主色、再收信息」的完整链路：主题枚举（绿 / 橙 / 紫 / 自定义）、`theme` 贯穿 spec → 提示词包 → HTML → 渲染 → 验色、交互式采集入口，以及色值出处的考据（IF.Land 2026 活动色板，并说明它不是通用品牌色）。
+
+本仓库的两个原始提交（`7072ac9`、`8dc7205`）保留了他的作者信息。
+
+</td>
+</tr>
+</table>
+
+---
+
 ## 沿革
 
 | 版本 | 变化 |
