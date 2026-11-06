@@ -274,8 +274,13 @@ def main():
 
     if args.profile == "draft":
         warns.append(f"草稿模式：跳过点缀色板校验（当前 {top_txt}）。渲染通道只解决文字层，不作为交付验收依据。")
-    elif args.theme != "green" and accent_total >= 0.5:
-        msg = f"本期 {primary_name} 配色不允许额外彩色：发现 {accent_total:.1f}%"
+    elif args.theme != "green" and accent_total > OFF_PALETTE_MAX:
+        # 非绿主题不开放点缀色板，但抗锯齿/纸纹会带来百分之零点几的杂色，
+        # 因此沿用与绿色模式相同的容差，不做零容差判定。
+        msg = (
+            f"本期 {primary_name} 配色不开放点缀色：额外彩色 {accent_total:.1f}%，"
+            f"上限 {OFF_PALETTE_MAX:.1f}%（{top_txt}）"
+        )
         (warns if args.profile == "baseline" else fails).append(msg)
     elif off_share > OFF_PALETTE_MAX:
         msg = (

@@ -8,7 +8,7 @@
 <sub>Say it in one sentence. Get a poster that still looks like it came from the same studio.</sub></p>
 
 <p>
-<img src="https://img.shields.io/badge/version-2.1.0-B1FA63?style=flat-square&labelColor=242021" alt="version" />
+  <img src="https://img.shields.io/badge/version-2.2.0--color-B1FA63?style=flat-square&labelColor=242021" alt="version" />
 <img src="https://img.shields.io/badge/license-MIT-242021?style=flat-square" alt="license" />
 <img src="https://img.shields.io/badge/Node-%E2%89%A518-242021?style=flat-square&logo=node.js&logoColor=B1FA63" alt="node" />
 <img src="https://img.shields.io/badge/Python-%E2%89%A53.9-242021?style=flat-square&logo=python&logoColor=B1FA63" alt="python" />
@@ -23,11 +23,16 @@
 
 ## 这是什么
 
+> **这是「主色可选」实验版。** 纯单主色（经典绿）的稳定版在
+> [iflink-meetup-poster-skill](https://github.com/Verayi2007/iflink-meetup-poster-skill)。
+> 两者的视觉体系相同，差别是：本仓库把「本期主色」提前到交互第一步，允许绿 / 橙 / 紫 / 自定义。
+
+
 新版会先问你选哪种主色，再收活动信息并回读确认；三版出图后由你选继续精修的版本。绿、橙、紫色值来自品牌规范中的 IF.Land 2026 活动色板，社区通用品牌色仍在制定中。下文绿色数据是原作复盘，不是其他配色的固定要求。
 
 一套**给活动海报用的生产规范 + 工具链**。它不是"又一个生图提示词模板"，而是把一次真实生产对话（11 轮、6 次推翻重做）里踩过的坑，固化成可以反复执行的东西：
 
-- **视觉语言锁死**：配色、色块语法、字号层级、手绘质感 —— 保证每期一眼是同一套
+- **视觉语言锁死**：色块语法、字号层级、手绘质感、墨色与纸底 —— 保证每期一眼是同一套
 - **排版完全放开**：不预设左右分区，交给模型按内容自己排
 - **文案零错字**：活动名、时间、地点、嘉宾逐字进清单，成图后逐字核对
 - **品牌资产零误差**：Logo 与 slogan 不让模型画，出图后贴官方文件
@@ -126,7 +131,7 @@ HTML 里就五节：**先上传 → 复制提示词 → 出图之后 → 出问�
 
 | 🔒 锁死 | 🔓 放开 |
 | --- | --- |
-| 三主色 + 点缀色二选一、占比 | 分区与构图（左右 / 上下 / 满版 / 网格） |
+| 本期主色（绿/橙/紫/自定义）+ 墨色纸底、占比 | 分区与构图（左右 / 上下 / 满版 / 网格） |
 | 绿块压黑字、黑块压白字的**色块语法** | 插画占多大、压不压字 |
 | 字号层级（按画布高度的百分比） | 嘉宾横排还是竖排、几列 |
 | 手绘质感：平涂、4–5px 描边、收口略抖、无渐变 | 留白位置；配图内容（从嘉宾话题取材） |
@@ -164,7 +169,7 @@ HTML 里就五节：**先上传 → 复制提示词 → 出图之后 → 出问�
 | 闸门 | 看什么 | 怎么判 |
 | --- | --- | --- |
 | **G1 内容** | 活动名 / 时间 / 地点 / 嘉宾 / 福利 / slogan | 逐字核对，单字名与生僻字重点看 |
-| **G2 配色** | 三主色占比、点缀色是否落在双色板内 | `check-palette.py` 量测（**觉得偏色再跑**） |
+| **G2 配色** | 本期主色占比、是否混入额外彩色 | `check-palette.py --theme <本期色>` 量测（**觉得偏色再跑**） |
 | **G3 层级** | 缩到手机 1/3，第一眼是不是活动名 | 肉眼 |
 | **G4 字体** | 无衬线、同族、层级不倒挂 | 肉眼 |
 | **G5 图形语言** | 直角块、粗描边、无渐变 / 3D | 肉眼 |
@@ -242,7 +247,8 @@ $ python scripts/check-palette.py poster.png
 
 | 版本 | 变化 |
 | --- | --- |
-| **2.1.0** | 闸门分档（final/draft/baseline）、渲染器补墨色、仓库自检；验收改为可选 |
+| **2.2.0-color** | 主色可选（绿 / 橙 / 紫 / 自定义），闸门分档、仓库自检包含主题用例 |
+| 2.1.0 | 闸门分档（final/draft/baseline）、渲染器补墨色、仓库自检；验收改为可选 |
 | 2.0.0 | 可分发：环境自检、跨平台字体、LICENSE |
 | 1.9.0 | agent 引导式交付；包默认落真实桌面 |
 | 1.8.x | 产物收敛为一份整合 HTML 包；提示词改"一次给 3 版" |
@@ -255,7 +261,7 @@ $ python scripts/check-palette.py poster.png
 <div align="center">
 <sub>
 
-建立在一次真实的生产对话之上 · IF.Link 活动组 · 2026
+<sub>主色可选能力由 <a href="https://github.com/EeeEricxiao">@EeeEricxiao</a> 的 PR 贡献 · IF.Link 活动组 · 2026</sub>
 
 <code>Link the IFs, Connect the Dots</code>
 

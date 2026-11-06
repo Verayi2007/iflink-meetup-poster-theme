@@ -3,17 +3,19 @@
 """
 selftest.py — 仓库自检：防止"自家样张过不了自家闸门"这类问题复发
 
-检查四件事：
+检查五件事：
   1. 模板 spec 能通过 build-prompt 校验（0 error）
   2. 参考基准图在 baseline 档能过（旧色板产物，只看主色）
   3. 渲染通道产物在 draft 档能过，且墨色/荧光绿/奶油都在区间
-  4. 色板闸门判定正确：暖橙/淡紫 PASS，色板外青 FAIL
+  4. 经典绿的色板闸门判定正确：暖橙/淡紫 PASS，色板外青 FAIL
+  5. 主题配色：暖橙 / 淡紫 能走完 渲染 → 验色；默认仍是经典绿
 
 用法：python scripts/selftest.py
 退出码：0 全过 / 1 有失败
 """
 
 import glob
+import json
 import os
 import subprocess
 import sys
@@ -78,7 +80,7 @@ def check_render(tmp):
             continue
         g = sh([sys.executable, os.path.join(HERE, "check-palette.py"), out_png, "--profile", "draft"])
         txt = (g.stdout or "") + (g.stderr or "")
-        ink_ok = "深黑灰墨色" in txt and "✅ 深黑灰墨色" in txt
+        ink_ok = "✅ 深黑灰墨色" in txt
         check(spec, g.returncode == 0 and ink_ok, "墨色达标" if ink_ok else "墨色不达标")
 
 
@@ -97,7 +99,7 @@ def _recolor(src, dst, hexv):
 
 
 def check_palette_profiles(tmp):
-    print("\n[4] 色板判定（final 档）")
+    print("\n[4] 经典绿的色板判定（final 档）")
     src = os.path.join(REF, "final-poster.png")
     cases = [("暖橙 #FE7733", "#FE7733", 0), ("淡紫 #B2A1FF", "#B2A1FF", 0), ("板外青 #7FD1C1", "#7FD1C1", 1)]
     for label, hexv, want in cases:
@@ -105,6 +107,32 @@ def check_palette_profiles(tmp):
         _recolor(src, p, hexv)
         r = sh([sys.executable, os.path.join(HERE, "check-palette.py"), p, "--profile", "final"])
         check(label, r.returncode == want, "exit=%d (期望 %d)" % (r.returncode, want))
+
+
+def check_themes(tmp):
+    """主色可选：暖橙 / 淡紫 需能走完 渲染 → 验色，且默认仍是经典绿。"""
+    print("\n[5] 主题配色（orange / purple）")
+    spec_path = os.path.join(TEMPLATES, "sample-b-product.json")
+    spec = json.load(open(spec_path, encoding="utf-8"))
+
+    for theme in ("orange", "purple"):
+        s = dict(spec)
+        s["theme"] = theme
+        p = os.path.join(tmp, f"spec-{theme}.json")
+        json.dump(s, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+        png = os.path.join(tmp, f"render-{theme}.png")
+        r = sh([sys.executable, os.path.join(HERE, "render-poster.py"), p, "--out", png])
+        if r.returncode != 0 or not os.path.exists(png):
+            check(f"{theme} 渲染", False, "渲染失败")
+            continue
+        g = sh([sys.executable, os.path.join(HERE, "check-palette.py"), png, "--theme", theme, "--profile", "final"])
+        check(f"{theme} 主题验色", g.returncode == 0, "exit=%d" % g.returncode)
+
+    # 不加 --theme 时默认按经典绿判：参考图仍应是 baseline 可过
+    g = sh([sys.executable, os.path.join(HERE, "check-palette.py"),
+            os.path.join(REF, "final-poster.png"), "--profile", "baseline"])
+    txt = (g.stdout or "") + (g.stderr or "")
+    check("默认主题仍是经典绿", "经典绿" in txt, "baseline 输出含主色名")
 
 
 def main():
@@ -116,6 +144,7 @@ def main():
         check_baseline()
         check_render(tmp)
         check_palette_profiles(tmp)
+        check_themes(tmp)
     print("─" * 62)
     if fails:
         print(f"{BAD} {len(fails)} 项未通过：" + "、".join(fails))
